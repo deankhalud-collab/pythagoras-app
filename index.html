@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kalkulator Pythagoras dengan Gambar Segitiga</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+        Ubuntu, Cantarell, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #e0f2fe 0%, #e0e7ff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .calculator-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .header h1 {
+      color: #1f2937;
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      color: #6b7280;
+      font-size: 1rem;
+    }
+
+    .input-group {
+      margin-bottom: 10px;
+    }
+
+    .input-group label {
+      display: block;
+      color: #374151;
+      font-weight: 500;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .input-group input.error {
+      border-color: #ef4444;
+    }
+
+    .error-message {
+      color: #ef4444;
+      font-size: 0.85rem;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .result-container {
+      background: #f9fafb;
+      border: 2px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .result-container h3 {
+      color: #374151;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .formula {
+      margin-bottom: 15px;
+    }
+
+    .formula code {
+      background: #f3f4f6;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 0.9rem;
+      color: #1f2937;
+    }
+
+    .result-main {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #2563eb;
+      margin-bottom: 8px;
+    }
+
+    .result-steps {
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+
+    .info-box {
+      background: #eff6ff;
+      border: 2px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 0.9rem;
+      color: #374151;
+    }
+
+    /* Container untuk gambar dan hasil berdampingan */
+    .visual-container {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* SVG container */
+    .triangle-svg {
+      flex-shrink: 0;
+      width: 250px;
+      height: 250px;
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
+      background: #f9fafb;
+      box-shadow: inset 0 0 10px #e0e7ff;
+      position: relative;
+    }
+
+    /* Label sisi pada gambar */
+    .label-text {
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      fill: #2563eb;
+      font-weight: 600;
+      user-select: none;
+    }
+
+    @media (max-width: 600px) {
+      .visual-container {
+        flex-direction: column;
+      }
+      .triangle-svg {
+        width: 100%;
+        height: 250px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator-container">
+    <div class="header">
+      <h1>Kalkulator Pythagoras</h1>
+      <p>Hitung sisi miring segitiga siku-siku</p>
+    </div>
+
+    <div class="input-group">
+      <label for="sideA">Sisi A (alas)</label>
+      <input
+        type="text"
+        id="sideA"
+        placeholder="Masukkan panjang sisi A"
+        oninput="calculateHypotenuse()"
+      />
+      <div class="error-message" id="errorA">Hanya angka yang diperbolehkan</div>
+    </div>
+
+    <div class="input-group">
+      <label for="sideB">Sisi B (tinggi)</label>
+      <input
+        type="text"
+        id="sideB"
+        placeholder="Masukkan panjang sisi B"
+        oninput="calculateHypotenuse()"
+      />
+      <div class="error-message" id="errorB">Hanya angka yang diperbolehkan</div>
+    </div>
+
+    <div class="visual-container">
+      <div class="triangle-svg" aria-label="Gambar segitiga siku-siku" role="img">
+        <svg
+          id="triangleSVG"
+          width="100%"
+          height="100%"
+          viewBox="0 0 260 260"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <!-- Garis alas -->
+          <line id="lineA" x1="20" y1="240" x2="220" y2="240" stroke="#2563eb" stroke-width="4" />
+          <!-- Garis tinggi -->
+          <line id="lineB" x1="20" y1="240" x2="20" y2="40" stroke="#2563eb" stroke-width="4" />
+          <!-- Garis miring -->
+          <line id="lineC" x1="220" y1="240" x2="20" y2="40" stroke="#2563eb" stroke-width="4" />
+
+          <!-- Titik sudut -->
+          <circle cx="20" cy="240" r="5" fill="#2563eb" />
+          <circle cx="220" cy="240" r="5" fill="#2563eb" />
+          <circle cx="20" cy="40" r="5" fill="#2563eb" />
+
+          <!-- Label sisi -->
+          <text id="labelA" class="label-text" x="120" y="260" text-anchor="middle" dominant-baseline="hanging">A</text>
+          <text id="labelB" class="label-text" x="5" y="140" text-anchor="end" dominant-baseline="middle">B</text>
+          <text id="labelC" class="label-text" x="120" y="130" text-anchor="middle" dominant-baseline="middle">C</text>
+
+          <!-- Tanda siku-siku -->
+          <polyline
+            id="rightAngle"
+            points="20,240 40,240 40,220"
+            fill="none"
+            stroke="#2563eb"
+            stroke-width="3"
+          />
+        </svg>
+      </div>
+
+      <div class="result-container" style="flex: 1; min-width: 250px;">
+        <h3>Hasil Perhitungan</h3>
+
+        <div class="formula">
+          <span>Rumus: </span>
+          <code>c = √(a² + b²)</code>
+        </div>
+
+        <div class="result-value">
+          <div id="resultMain" class="result-main">
+            Masukkan nilai sisi A dan B
+          </div>
+          <div id="resultSteps" class="result-steps">-</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <h4>Informasi:</h4>
+      <p>
+        Teorema Pythagoras menyatakan bahwa dalam segitiga siku-siku, kuadrat sisi miring
+        sama dengan jumlah kuadrat kedua sisi lainnya.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    function calculateHypotenuse() {
+      const sideAInput = document.getElementById('sideA');
+      const sideBInput = document.getElementById('sideB');
+      const resultMain = document.getElementById('resultMain');
+      const resultSteps = document.getElementById('resultSteps');
+      const errorA = document.getElementById('errorA');
+      const errorB = document.getElementById('errorB');
+
+      // Reset error states
+      sideAInput.classList.remove('error');
+      sideBInput.classList.remove('error');
+      errorA.style.display = 'none';
+      errorB.style.display = 'none';
+
+      const sideAValue = sideAInput.value.trim();
+      const sideBValue = sideBInput.value.trim();
+
+      // Validasi input
+      let hasError = false;
+
+      if (sideAValue && !/^\d*\.?\d*$/.test(sideAValue)) {
+        sideAInput.classList.add('error');
+        errorA.style.display = 'block';
+        hasError = true;
+      }
+
+      if (sideBValue && !/^\d*\.?\d*$/.test(sideBValue)) {
+        sideBInput.classList.add('error');
+        errorB.style.display = 'block';
+        hasError = true;
+      }
+
+      if (hasError) {
+        resultMain.textContent = 'Input tidak valid';
+        resultSteps.textContent = '-';
+        updateTriangle(0, 0);
+        return;
+      }
+
+      const a = parseFloat(sideAValue) || 0;
+      const b = parseFloat(sideBValue) || 0;
+
+      if (a > 0 && b > 0) {
+        const aSquared = Math.pow(a, 2);
+        const bSquared = Math.pow(b, 2);
+        const sumSquared = aSquared + bSquared;
+        const hypotenuse = Math.sqrt(sumSquared);
+
+        resultMain.textContent = `Sisi Miring (c) = ${hypotenuse.toFixed(2)}`;
+        resultSteps.textContent =
+          `√(${a}² + ${b}²) = √(${aSquared} + ${bSquared}) = √${sumSquared}`;
+
+        updateTriangle(a, b);
+      } else if (a > 0 || b > 0) {
+        resultMain.textContent = 'Masukkan kedua sisi';
+        resultSteps.textContent = 'Kedua sisi harus diisi untuk menghitung';
+        updateTriangle(0, 0);
+      } else {
+        resultMain.textContent = 'Masukkan nilai sisi A dan B';
+        resultSteps.textContent = '-';
+        updateTriangle(0, 0);
+      }
+    }
+
+    // Fungsi untuk update gambar segitiga sesuai sisi alas dan tinggi
+    function updateTriangle(a, b) {
+      const svg = document.getElementById('triangleSVG');
+      const lineA = document.getElementById('lineA');
+      const lineB = document.getElementById('lineB');
+      const lineC = document.getElementById('lineC');
+      const labelA = document.getElementById('labelA');
+      const labelB = document.getElementById('labelB');
+      const labelC = document.getElementById('labelC');
+      const rightAngle = document.getElementById('rightAngle');
+
+      // Jika a atau b 0 atau tidak valid, reset ke default
+      if (a <= 0 || b <= 0) {
+        // Default segitiga 200x200 px
+        lineA.setAttribute('x1', '20');
+        lineA.setAttribute('y1', '240');
+        lineA.setAttribute('x2', '220');
+        lineA.setAttribute('y2', '240');
+
+        lineB.setAttribute('x1', '20');
+        lineB.setAttribute('y1', '240');
+        lineB.setAttribute('x2', '20');
+        lineB.setAttribute('y2', '40');
+
+        lineC.setAttribute('x1', '220');
+        lineC.setAttribute('y1', '240');
+        lineC.setAttribute('x2', '20');
+        lineC.setAttribute('y2', '40');
+
+        labelA.setAttribute('x', '120');
+        labelA.setAttribute('y', '260');
+
+        labelB.setAttribute('x', '5');
+        labelB.setAttribute('y', '140');
+
+        labelC.setAttribute('x', '120');
+        labelC.setAttribute('y', '130');
+
+        rightAngle.setAttribute('points', '20,240 40,240 40,220');
+        return;
+      }
+
+      // Skala agar gambar muat di dalam kotak 200x200 px dengan margin
+      const maxWidth = 200;
+      const maxHeight = 200;
+      const margin = 20;
+
+      // Tentukan skala berdasarkan sisi terbesar
+      const scaleX = maxWidth / a;
+      const scaleY = maxHeight / b;
+      const scale = Math.min(scaleX, scaleY);
+
+      // Hitung koordinat titik-titik segitiga
+      // Titik sudut siku-siku di (margin + 0, margin + maxHeight)
+      const x0 = margin;
+      const y0 = margin + maxHeight;
+
+      // Titik alas (a) di kanan bawah
+      const x1 = x0 + a * scale;
+      const y1 = y0;
+
+      // Titik tinggi (b) di kiri atas
+      const x2 = x0;
+      const y2 = y0 - b * scale;
+
+      // Update garis alas (A)
+      lineA.setAttribute('x1', x0);
+      lineA.setAttribute('y1', y0);
+      lineA.setAttribute('x2', x1);
+      lineA.setAttribute('y2', y1);
+
+      // Update garis tinggi (B)
+      lineB.setAttribute('x1', x0);
+      lineB.setAttribute('y1', y0);
+      lineB.setAttribute('x2', x2);
+      lineB.setAttribute('y2', y2);
+
+      // Update garis miring (C)
+      lineC.setAttribute('x1', x1);
+      lineC.setAttribute('y1', y1);
+      lineC.setAttribute('x2', x2);
+      lineC.setAttribute('y2', y2);
+
+      // Update label posisi
+      labelA.setAttribute('x', (x0 + x1) / 2);
+      labelA.setAttribute('y', y0 + 15);
+
+      labelB.setAttribute('x', x0 - 5);
+      labelB.setAttribute('y', (y0 + y2) / 2);
+
+      labelC.setAttribute('x', (x1 + x2) / 2 + 10);
+      labelC.setAttribute('y', (y1 + y2) / 2 - 10);
+
+      // Update tanda siku-siku (kotak kecil)
+      // Buat kotak siku-siku di sudut kanan bawah (x0,y0)
+      // Ukuran kotak siku-siku 20x20 px, disesuaikan dengan skala
+      const size = 20;
+
+      // Titik kotak siku-siku: (x0,y0), (x0+size,y0), (x0+size,y0-size)
+      rightAngle.setAttribute(
+        'points',
+        `${x0},${y0} ${x0 + size},${y0} ${x0 + size},${y0 - size}`
+      );
+    }
+
+    // Batasi input hanya angka dan titik
+    document.getElementById('sideA').addEventListener('input', function () {
+      this.value = this.value.replace(/[^0-9.]/g, '');
+    });
+
+    document.getElementById('sideB').addEventListener('input', function () {
+      this.value = this.value.replace(/[^0-9.]/g, '');
+    });
+
+    // Inisialisasi gambar default
+    updateTriangle(0, 0);
+  </script>
+</body>
+</html>
